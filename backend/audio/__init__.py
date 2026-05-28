@@ -1,0 +1,1 @@
+# Django audio app initialization
