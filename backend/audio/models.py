@@ -4,8 +4,20 @@ class Project(models.Model):
     """
     Represents an audio project or song containing multiple multi-track stems.
     """
+    STATUS_CHOICES = [
+        ('Pending', 'Pending'),
+        ('Processing', 'Processing'),
+        ('Completed', 'Completed'),
+        ('Failed', 'Failed'),
+    ]
+
     title = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='Pending'
+    )
 
     class Meta:
         ordering = ['-created_at']

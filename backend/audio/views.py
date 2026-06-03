@@ -9,6 +9,7 @@ from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 
 from .models import Project, Track
 from .serializers import ProjectSerializer, TrackSerializer
+from .tasks import process_audio_separation
 
 class ProjectListCreateAPIView(APIView):
     """
@@ -54,8 +55,8 @@ class ProjectListCreateAPIView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # Create the parent Project object
-        project = Project.objects.create(title=title)
+        # Create the parent Project object in Processing state
+        project = Project.objects.create(title=title, status='Processing')
 
         # Build individual tracks for each stem
         try:
@@ -85,9 +86,12 @@ class ProjectListCreateAPIView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
+        # Dispatch AI separation asynchronously to Celery message queues
+        process_audio_separation.delay(project.id)
+
         # Re-fetch project to ensure absolute file paths are generated in response
         serializer = ProjectSerializer(project, context={'request': request})
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
 
 class TrackStreamView(APIView):

@@ -703,7 +703,7 @@ class MixerTab extends ConsumerWidget {
               Icon(
                 Icons.album_rounded,
                 size: 80,
-                color: const Color(0xFF242629).withOpacity(0.8),
+                color: const Color(0xFF242629).withValues(alpha: 0.8),
               ),
               const SizedBox(height: 20),
               const Text(
@@ -760,10 +760,10 @@ class MixerTab extends ConsumerWidget {
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFF7F5AF0).withOpacity(0.1),
+              color: const Color(0xFF7F5AF0).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
-              border:
-                  Border.all(color: const Color(0xFF7F5AF0).withOpacity(0.3)),
+              border: Border.all(
+                  color: const Color(0xFF7F5AF0).withValues(alpha: 0.3)),
             ),
             child: Row(
               children: [
@@ -887,7 +887,7 @@ class MasterSection extends ConsumerWidget {
                               color: (playerState.isPlaying
                                       ? const Color(0xFF2CB67D)
                                       : const Color(0xFF7F5AF0))
-                                  .withOpacity(0.3),
+                                  .withValues(alpha: 0.3),
                               blurRadius: 10,
                               offset: const Offset(0, 4),
                             )
@@ -999,9 +999,9 @@ class TrackMixerStrip extends ConsumerWidget {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: trackStatus.contains('error')
-              ? Colors.redAccent.withOpacity(0.5)
+              ? Colors.redAccent.withValues(alpha: 0.5)
               : isMuted
-                  ? Colors.redAccent.withOpacity(0.2)
+                  ? Colors.redAccent.withValues(alpha: 0.2)
                   : const Color(0xFF242629),
           width: 1,
         ),
@@ -1033,7 +1033,8 @@ class TrackMixerStrip extends ConsumerWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
-                        color: _getStatusColor(trackStatus).withOpacity(0.15),
+                        color: _getStatusColor(trackStatus)
+                            .withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
@@ -1081,7 +1082,7 @@ class TrackMixerStrip extends ConsumerWidget {
                   height: 36,
                   decoration: BoxDecoration(
                     color: isMuted
-                        ? Colors.redAccent.withOpacity(0.2)
+                        ? Colors.redAccent.withValues(alpha: 0.2)
                         : const Color(0xFF242629),
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
@@ -1234,7 +1235,7 @@ class _AnimatedWaveformState extends State<AnimatedWaveform>
                 height: height.clamp(2.0, 32.0),
                 decoration: BoxDecoration(
                   color: widget.isPlaying
-                      ? const Color(0xFF7F5AF0).withOpacity(0.8)
+                      ? const Color(0xFF7F5AF0).withValues(alpha: 0.8)
                       : const Color(0xFF242629),
                   borderRadius: BorderRadius.circular(2),
                 ),
@@ -1326,7 +1327,7 @@ class UploadTab extends ConsumerWidget {
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
                           color: isLoaded
-                              ? const Color(0xFF7F5AF0).withOpacity(0.15)
+                              ? const Color(0xFF7F5AF0).withValues(alpha: 0.15)
                               : const Color(0xFF242629),
                           shape: BoxShape.circle,
                         ),
@@ -1351,7 +1352,8 @@ class UploadTab extends ConsumerWidget {
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 10, vertical: 4),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF7F5AF0).withOpacity(0.2),
+                                color: const Color(0xFF7F5AF0)
+                                    .withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(20),
                                 border: Border.all(
                                     color: const Color(0xFF7F5AF0), width: 0.5),
@@ -1409,9 +1411,10 @@ class UploadTab extends ConsumerWidget {
             error: (err, _) => Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.redAccent.withOpacity(0.1),
+                color: Colors.redAccent.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.redAccent.withOpacity(0.3)),
+                border:
+                    Border.all(color: Colors.redAccent.withValues(alpha: 0.3)),
               ),
               child: Column(
                 children: [
@@ -1466,9 +1469,11 @@ class _CreateProjectCardState extends ConsumerState<CreateProjectCard> {
         ];
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error choosing audio: $e')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error choosing audio: $e')),
+        );
+      }
     }
   }
 
