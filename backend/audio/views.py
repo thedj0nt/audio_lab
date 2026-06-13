@@ -55,8 +55,11 @@ class ProjectListCreateAPIView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+        # Collect chosen stems list (comma-separated string, e.g., "vocals,drums,guitar")
+        stems_str = request.data.get('stems', '')
+
         # Create the parent Project object in Processing state
-        project = Project.objects.create(title=title, status='Processing')
+        project = Project.objects.create(title=title, status='Processing', stems=stems_str)
 
         # Build individual tracks for each stem
         try:
@@ -92,6 +95,40 @@ class ProjectListCreateAPIView(APIView):
         # Re-fetch project to ensure absolute file paths are generated in response
         serializer = ProjectSerializer(project, context={'request': request})
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+
+
+class ProjectDetailAPIView(APIView):
+    """
+    API endpoint to retrieve or delete a single audio project session.
+    """
+    def delete(self, request, pk):
+        import shutil
+        from django.conf import settings
+        
+        project = get_object_or_404(Project, pk=pk)
+        print(f"[API] 🗑️ Initiating deletion for Project ID: {pk} ('{project.title}')")
+        
+        # Physical cleanup of all audio stem files on disk
+        for track in project.tracks.all():
+            if track.file and os.path.exists(track.file.path):
+                try:
+                    os.remove(track.file.path)
+                    print(f"  -> Deleted physical stem file: {track.file.path}")
+                except Exception as e:
+                    print(f"  -> Error deleting file {track.file.path}: {e}")
+                    
+        # Remove project directory projects/<id>/
+        project_dir = os.path.join(settings.MEDIA_ROOT, 'projects', str(project.id))
+        if os.path.exists(project_dir):
+            try:
+                shutil.rmtree(project_dir, ignore_errors=True)
+                print(f"  -> Wiped project directory: {project_dir}")
+            except Exception as e:
+                print(f"  -> Error wiping project directory: {e}")
+                
+        # Wipe database entry (cascade wipes track entries automatically)
+        project.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class TrackStreamView(APIView):

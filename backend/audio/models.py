@@ -18,6 +18,10 @@ class Project(models.Model):
         choices=STATUS_CHOICES,
         default='Pending'
     )
+    duration = models.IntegerField(null=True, blank=True)
+    bpm = models.IntegerField(null=True, blank=True)
+    scale = models.CharField(max_length=50, blank=True, default='')
+    stems = models.CharField(max_length=255, blank=True, default='')
 
     class Meta:
         ordering = ['-created_at']
